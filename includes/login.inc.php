@@ -22,7 +22,7 @@ if (isset($_POST['envoi'])) {
             $conn = new PDO("mysql:host=$serverName;dbname=$database", $userName, $userPassword);
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            $requete = $conn->prepare("SELECT * FROM t_users WHERE USERMAIL='$mail'");
+            $requete = $conn->prepare("SELECT * FROM users WHERE userMail='$mail'");
             $requete->execute();
             $resultat = $requete->fetchAll(PDO::FETCH_OBJ);
            
