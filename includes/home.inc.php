@@ -113,7 +113,7 @@ else {
             try {
                 $conn = new PDO("mysql:host=$serverName;dbname=$database", $userName, $userPassword);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);                
-                $requete = $conn->prepare("SELECT * FROM users WHERE USERMAIL='$email'");
+                $requete = $conn->prepare("SELECT * FROM users WHERE userMail='$email'");
                 $requete->execute();
                 $resultat = $requete->fetchAll(PDO::FETCH_OBJ);
             
