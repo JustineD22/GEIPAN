@@ -80,7 +80,7 @@ if (isset($_POST['inscription'])) {
     if (count($erreur) === 0) {
         $serverName = "localhost";
         $userName = "root";
-        $database = "gamelib";
+        $database = "geipan";
         $userPassword = "";
 
         try {
@@ -88,21 +88,15 @@ if (isset($_POST['inscription'])) {
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $password = password_hash($password, PASSWORD_DEFAULT);
             
-            $requete = $conn->prepare("SELECT * FROM users WHERE email='$email'");
+            $requete = $conn->prepare("SELECT * FROM users WHERE userMail='$email'");
             $requete->execute();
             $resultat = $requete->fetchAll(PDO::FETCH_OBJ);
            
             if(count($resultat) !== 0) {
-                $query1 = $conn->prepare("
-                INSERT INTO users(userName, userFirstname, email, userPassword, userAvatar)
-                VALUES (:name, :firstname, :password, :bio, :avatar)
-                ");
-
-                $query1->bindParam(':name', $name, PDO::PARAM_STR_CHAR);
-                $query1->bindParam(':firstname', $firstname, PDO::PARAM_STR_CHAR);
-                $query1->bindParam(':password', $password);
-                $query1->bindParam(':avatar', $fileNameFinal);
-                $query1->execute();
+                $queryupdate = $conn->prepare(" UPDATE users 
+                SET id_role = 2, userName = '$name', UserFirstname = '$firstname', userPassword = '$password', userAvatar = '$fileNameFinal'
+                WHERE userMail = '$email' ");
+                $queryupdate->execute();
 
                 move_uploaded_file($fileTmpName, $path . $fileName);
                 
@@ -111,8 +105,8 @@ if (isset($_POST['inscription'])) {
 
             else {
                 $query = $conn->prepare("
-                INSERT INTO users(userName, userFirstname, email, pseudo, password, avatar)
-                VALUES (:name, :firstname, :email, :password, :bio, :avatar)
+                INSERT INTO users(userName, userFirstname, userMail, userPassword, userAvatar)
+                VALUES (:name, :firstname, :email, :password, :avatar)
                 ");
 
                 $query->bindParam(':name', $name, PDO::PARAM_STR_CHAR);
