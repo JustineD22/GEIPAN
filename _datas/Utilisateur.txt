@@ -1,0 +1,6 @@
+Utilsateur 1 : 
+mail : juju.donnadieu -> mdp : 1234
+
+Utilsateur 2 : 
+mail :  toto@toto.com -> mdp : 4567
+
