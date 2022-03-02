@@ -52,7 +52,7 @@ else {
             <select name="meteo">
                 <option value="Soleil">Soleil</option>
                 <option value="Nuageux">Nuageux</option>
-                <option value="Pluie">Plue</option>
+                <option value="Pluie">Pluie</option>
                 <option value="Vent">Vent</option>
             </select>
         </li>
@@ -92,9 +92,6 @@ else {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             array_push($erreur, "Veuillez saisir un e-mail valide");
         }
-        if ($states === 0) {
-            array_push($erreur, "Veuillez choisir un département");
-        }
         if ($dateEv === 0) {
             array_push($erreur, "Veuillez saisir une date");
         }
@@ -116,16 +113,32 @@ else {
             try {
                 $conn = new PDO("mysql:host=$serverName;dbname=$database", $userName, $userPassword);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);                
-                $requete = $conn->prepare("SELECT * FROM t_users WHERE USERMAIL='$email'");
+                $requete = $conn->prepare("SELECT * FROM users WHERE USERMAIL='$email'");
                 $requete->execute();
                 $resultat = $requete->fetchAll(PDO::FETCH_OBJ);
             
                 if(count($resultat) !== 0) {
-                    echo "<p>Votre adresse est déjà enregistrée dans la base de données</p>";
+                    $queryobservation1 = $conn->prepare("
+                    INSERT INTO observations(obsDateTime, obsDuration, obsLocation, obsCardinalPoint, obsWeather, obsDescription, id_state)
+                    VALUES (:datetime, :duration, :location, :direction, :meteo, :description, :id_state)
+                    ");
+
+                    $queryobservation1->bindParam(':datetime', $dateEv);
+                    $queryobservation1->bindParam(':duration', $duration);
+                    $queryobservation1->bindParam(':location', $states);
+                    $queryobservation1->bindParam(':direction', $direction);
+                    $queryobservation1->bindParam(':meteo', $meteo);
+                    $queryobservation1->bindParam(':description', $description);
+                    $queryobservation->bindParam(':id_state', $idstate);
+                    
+
+                    $queryobservation1->execute();
+                    
+                    echo "<p>Votre Observation à été envoyé</p>";
                 }
 
                 else {
-                    $query = $conn->prepare("
+                    $queryuser = $conn->prepare("
                     INSERT INTO users(id_role, userMail)
                     VALUES (:id_role, :usermail)
                     ");
@@ -136,21 +149,20 @@ else {
                     $queryuser->execute();
 
                     $queryobservation = $conn->prepare("
-                    INSERT INTO observation(obsDateTime, obsDuration, obsLocation, obsCardinalPoint, obsWeather, obsDescription)
-                    VALUES (:datetime, :duration, :location, :direction, :meteo, :description, :id_state)
+                    INSERT INTO observations(obsDateTime, obsDuration, obsLocation, obsCardinalPoint, obsWeather, obsDescription)
+                    VALUES (:datetime, :duration, :location, :direction, :meteo, :description)
                     ");
 
+                    $queryobservation->bindParam(':datetime', $dateEv);
+                    $queryobservation->bindParam(':duration', $duration);
+                    $queryobservation->bindParam(':location', $states);
+                    $queryobservation->bindParam(':direction', $direction);
+                    $queryobservation->bindParam(':meteo', $meteo);
+                    $queryobservation->bindParam(':description', $description);
+                    // $queryobservation->bindParam(':id_state', $idstate);
+                    
 
-
-                    $query->bindParam(':datetime', $dateEv-$timeEv);
-                    $query->bindParam(':duration', $duration);
-                    $query->bindParam(':location', $states);
-                    $query->bindParam(':direction', $direction);
-                    $query->bindParam(':meteo', $meteo);
-                    $query->bindParam(':description', $description);
-                    // $query->bindParam(':id_state', );
-
-                    $query->execute();
+                    $queryobservation->execute();
                     
                     echo "<p>Votre Observation à été envoyé</p>";
                 }
@@ -173,7 +185,7 @@ else {
         }
     } else {
         echo "<h2>Merci de renseigner le formulaire&nbsp;:</h2>";
-        $emai = $states = $dateEv = $timeEv  = '';
+        $emai = $dateEv = $timeEv  = '';
     }
 
 }
