@@ -15,10 +15,10 @@ function getStates()
     $resultatState = $requeteState->fetchAll(PDO::FETCH_ASSOC);
     
         $html = "<select name='states[]'>";
-        for ($i = 0 ; $i < count($resultatState) ; $i++) {
-            
+        for ($i = 0 ; $i < count($resultatState) ; $i++) {   
             $html .= "<optgroup label='" . $resultatState[$i]['stateNumber'] . "'>";
-            $html .= "<option value='" . $resultatState[$i]['stateLabel'] . "'>";           
+            $html .= "<option value='" . $resultatState[$i]['stateLabel'] . "'>";
+            $html .= $resultatState[$i]['stateLabel'];          
             $html .= "</option>";
             $html .= "</optgroup>";
         }
